@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ecommerce-backend
+    container_name: ecommerce-backend-1
     ports:
       - "8000:80"
     volumes:
@@ -20,7 +20,7 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: ecommerce-db
+    container_name: ecommerce-db-1
     restart: always
     environment:
       MYSQL_DATABASE: laravel
@@ -34,7 +34,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: ecommerce-pma
+    container_name: ecommerce-pma-1
     restart: always
     ports:
       - "8080:80"
