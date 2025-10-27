@@ -10,7 +10,7 @@ function App() {
     <div className="App">
       {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-light bg-light px-4 shadow-sm">
-        <Link className="navbar-brand fw-bold" to="/">Task Manager</Link>
+        <Link className="navbar-brand fw-bold" to="/">Task Management Application</Link>
         <div className="collapse navbar-collapse">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
@@ -26,7 +26,7 @@ function App() {
       {/* Routes */}
       <div className="container mt-4">
         <Routes>
-          <Route path="/" element={<h2>Welcome! Click “Tasks” to start.</h2>} />
+          <Route path="/" element={<h2>Welcome to Task Manager! Click Tasks to view task.</h2>} />
           <Route path="/tasks" element={<TaskList />} />
           <Route path="/add-task" element={<TaskForm />} />
           <Route path="/update-task/:taskId" element={<TaskUpdate />} />
