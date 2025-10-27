@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import hooks
+import { useParams, useNavigate } from "react-router-dom";
 
 function TaskUpdate() {
-  const { taskId } = useParams(); // Get ID from route params
-  const navigate = useNavigate(); // Hook for navigation
+  const { taskId } = useParams();
+  const navigate = useNavigate();
 
   // State for form fields
   const [title, setTitle] = useState("");
@@ -21,7 +21,7 @@ function TaskUpdate() {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch(`http://localhost:8082/api/tasks/${taskId}`);
+        const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch task");
         }
@@ -53,12 +53,12 @@ function TaskUpdate() {
       title, 
       description, 
       status, 
-      due_date: dueDate || null // Handle empty date
+      due_date: dueDate || null 
     };
 
     try {
-      const response = await fetch(`http://localhost:8082/api/tasks/${taskId}`, {
-        method: "PUT", // Use PUT for update
+      const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",

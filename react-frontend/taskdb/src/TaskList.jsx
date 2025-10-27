@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // For the "Update" button
+import { Link } from "react-router-dom"; 
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
@@ -10,8 +10,8 @@ function TaskList() {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      // Make sure this URL is correct!
-      const response = await fetch("http://localhost:8082/api/tasks");
+     
+      const response = await fetch("http://localhost:8000/api/tasks");
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.statusText}`);
       }
@@ -28,13 +28,13 @@ function TaskList() {
   // Fetch tasks when component mounts
   useEffect(() => {
     fetchTasks();
-  }, []); // Empty array means this runs once on mount
+  }, []); 
 
-  // --- Delete Task Handler ---
+  
   const handleDelete = async (taskId) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
-        const response = await fetch(`http://localhost:8082/api/tasks/${taskId}`, {
+        const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
           method: "DELETE",
         });
 
@@ -42,7 +42,7 @@ function TaskList() {
           throw new Error("Failed to delete task");
         }
 
-        // If delete is successful, filter it out of the list
+        
         setTasks(tasks.filter(task => task.id !== taskId));
 
       } catch (err) {
@@ -51,7 +51,7 @@ function TaskList() {
     }
   };
 
-  // --- Render Logic ---
+  
   if (loading) return <p>Loading tasks...</p>;
   if (error) return <p style={styles.error}>Error fetching tasks: {error}</p>;
 

@@ -23,7 +23,7 @@ function TaskForm() {
     };
 
     try {
-      const response = await fetch("http://localhost:8082/api/tasks", {
+      const response = await fetch("http://localhost:8000/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
