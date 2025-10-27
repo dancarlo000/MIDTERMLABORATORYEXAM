@@ -1,137 +1,97 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; 
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 
 function TaskList() {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // Function to fetch tasks
   const fetchTasks = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-     
-      const response = await fetch("http://localhost:8000/api/tasks");
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
-      const data = await response.json();
-      setTasks(data);
-      setError(null);
+      const response = await fetch("http://localhost:8000/api/tasks")
+      if (!response.ok) throw new Error("Failed to fetch tasks")
+      const data = await response.json()
+      setTasks(data)
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // Fetch tasks when component mounts
   useEffect(() => {
-    fetchTasks();
-  }, []); 
+    fetchTasks()
+  }, [])
 
-  
   const handleDelete = async (taskId) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      try {
-        const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
-          method: "DELETE",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to delete task");
-        }
-
-        
-        setTasks(tasks.filter(task => task.id !== taskId));
-
-      } catch (err) {
-        setError(err.message);
-      }
+    if (!window.confirm("Are you sure you want to delete this task?")) return
+    try {
+      const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Failed to delete task")
+      setTasks(tasks.filter((task) => task.id !== taskId))
+    } catch (err) {
+      setError(err.message)
     }
-  };
+  }
 
-  
-  if (loading) return <p>Loading tasks...</p>;
-  if (error) return <p style={styles.error}>Error fetching tasks: {error}</p>;
+  if (loading)
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" role="status"></div>
+        <p className="mt-2">Loading tasks...</p>
+      </div>
+    )
+
+  if (error)
+    return <div className="alert alert-danger text-center mt-4">Error: {error}</div>
 
   return (
-    <div style={styles.container}>
-      <h2>Task List</h2>
-      <ul style={styles.list}>
-        {tasks.length === 0 && <p>No tasks found.</p>}
-        {tasks.map((task) => (
-          <li key={task.id} style={styles.listItem}>
-            <div>
-              <strong>{task.title}</strong> (Status: {task.status})
-              <p>{task.description || "No description."}</p>
-              {task.due_date && <small>Due: {task.due_date}</small>}
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>Task List</h2>
+        <Link to="/add-task" className="btn btn-success">+ Add Task</Link>
+      </div>
+
+      {tasks.length === 0 ? (
+        <div className="alert alert-info text-center">No tasks found.</div>
+      ) : (
+        <div className="list-group">
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              className="list-group-item d-flex justify-content-between align-items-start"
+            >
+              <div>
+                <h5>{task.title}</h5>
+                <p className="mb-1">{task.description || "No description."}</p>
+                <small className="text-muted">
+                  Status: {task.status}{" "}
+                  {task.due_date && <>| Due: {task.due_date}</>}
+                </small>
+              </div>
+              <div>
+                <Link
+                  to={`/update-task/${task.id}`}
+                  className="btn btn-primary btn-sm me-2"
+                >
+                  Edit
+                </Link>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDelete(task.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            <div style={styles.buttonGroup}>
-              {/* UPDATE Button */}
-              <Link to={`/update-task/${task.id}`} style={styles.updateButton}>
-                Update
-              </Link>
-              {/* DELETE Button */}
-              <button
-                onClick={() => handleDelete(task.id)}
-                style={styles.deleteButton}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
+      )}
     </div>
-  );
+  )
 }
 
-// --- Styles ---
-const styles = {
-  container: {
-    margin: "0 auto",
-    maxWidth: "700px",
-  },
-  error: {
-    color: 'red',
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-  },
-  listItem: {
-    padding: '1rem',
-    border: '1px solid #eee',
-    borderRadius: '8px',
-    marginBottom: '1rem',
-    backgroundColor: '#fff',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  buttonGroup: {
-    display: 'flex',
-    gap: '0.5rem',
-  },
-  updateButton: {
-    padding: '0.4rem 0.8rem',
-    backgroundColor: '#007bff',
-    color: 'white',
-    textDecoration: 'none',
-    borderRadius: '5px',
-    fontSize: '0.9rem',
-  },
-  deleteButton: {
-    padding: '0.4rem 0.8rem',
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-  }
-};
-
-export default TaskList;
+export default TaskList

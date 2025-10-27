@@ -1,49 +1,39 @@
 import { Routes, Route, Link } from 'react-router-dom'
-import TaskList from '/src/TaskList.jsx' 
-import TaskForm from '/src/TaskForm.jsx' 
-import TaskUpdate from '/src/TaskUpdate.jsx' 
-import '/src/App.css' 
+import TaskList from '/src/TaskList.jsx'
+import TaskForm from '/src/TaskForm.jsx'
+import TaskUpdate from '/src/TaskUpdate.jsx'
+import '/src/App.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 function App() {
- 
   return (
     <div className="App">
-      {/* 1. Navigation Bar */}
-      <nav style={styles.nav}>
-        <Link to="/" style={styles.navLink}>Home</Link>
-        <Link to="/tasks" style={styles.navLink}>Tasks</Link>
+      {/* Navbar */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-light px-4 shadow-sm">
+        <Link className="navbar-brand fw-bold" to="/">Task Manager</Link>
+        <div className="collapse navbar-collapse">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <Link to="/" className="nav-link">Home</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/tasks" className="nav-link">Tasks</Link>
+            </li>
+          </ul>
+        </div>
       </nav>
 
-      {/* 2. Page Content Area */}
-      <main style={styles.content}>
+      {/* Routes */}
+      <div className="container mt-4">
         <Routes>
-          <Route path="/" element={<h2>Welcome! Click 'Tasks' to start.</h2>} />
+          <Route path="/" element={<h2>Welcome! Click “Tasks” to start.</h2>} />
           <Route path="/tasks" element={<TaskList />} />
           <Route path="/add-task" element={<TaskForm />} />
           <Route path="/update-task/:taskId" element={<TaskUpdate />} />
         </Routes>
-      </main>
+      </div>
     </div>
   )
 }
 
-const styles = {
-  nav: {
-    display: 'flex',
-    gap: '1rem',
-    padding: '1rem',
-    backgroundColor: '#f4f4f4',
-    borderBottom: '1px solid #ddd',
-  },
-  navLink: {
-    textDecoration: 'none',
-    color: '#007bff',
-    fontWeight: 'bold',
-    fontSize: '1.1rem',
-  },
-  content: {
-    padding: '1rem 2rem',
-  }
-}
-
-export default App;
+export default App

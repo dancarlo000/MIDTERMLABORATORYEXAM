@@ -1,169 +1,122 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 
 function TaskUpdate() {
-  const { taskId } = useParams();
-  const navigate = useNavigate();
+  const { taskId } = useParams()
+  const navigate = useNavigate()
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [status, setStatus] = useState("pending")
+  const [dueDate, setDueDate] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
-  // State for form fields
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("pending");
-  const [dueDate, setDueDate] = useState("");
-
-  // State for loading, errors, and saving
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
-
-  // 1. Fetch the existing task data when the component loads
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch task");
-        }
-        const data = await response.json();
-        
-        // Populate the form with the data
-        setTitle(data.title);
-        setDescription(data.description || "");
-        setStatus(data.status);
-        // Format date for <input type="date"> which expects YYYY-MM-DD
-        setDueDate(data.due_date ? data.due_date.split('T')[0] : ""); 
-
+        const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`)
+        if (!res.ok) throw new Error("Failed to load task")
+        const data = await res.json()
+        setTitle(data.title)
+        setDescription(data.description || "")
+        setStatus(data.status)
+        setDueDate(data.due_date ? data.due_date.split("T")[0] : "")
       } catch (err) {
-        setError(err.message);
+        setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchTask();
-  }, [taskId]); // Re-run if taskId changes
+    }
+    fetchTask()
+  }, [taskId])
 
-  // 2. Handle the form submission (PUT request)
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setMessage("");
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
 
-    const taskData = { 
-      title, 
-      description, 
-      status, 
-      due_date: dueDate || null 
-    };
+    const updatedTask = { title, description, status, due_date: dueDate || null }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
-        method: "PUT", 
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(taskData),
-      });
+      const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(updatedTask),
+      })
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Failed to update task");
-      }
-
-      // If successful, navigate back to the task list
-      navigate("/tasks");
-
-    } catch (error) {
-      setMessage(`Error: ${error.message}`);
-      setSaving(false);
+      if (!res.ok) throw new Error("Failed to update task")
+      navigate("/tasks")
+    } catch (err) {
+      setError(err.message)
+      setSaving(false)
     }
-  };
+  }
 
-  // --- Render Logic ---
-  if (loading) return <p>Loading task data...</p>;
-  if (error) return <p style={styles.error}>{error}</p>;
+  if (loading) return <p className="text-center mt-5">Loading task...</p>
+  if (error) return <div className="alert alert-danger text-center">{error}</div>
 
   return (
-    <div style={styles.container}>
-      <h2>Update Task (ID: {taskId})</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Task Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          type="text" // <-- This is where your code cut off
-          placeholder="Status (e.g., pending)"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        />
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-        />
-        <button type="submit" disabled={saving} style={styles.saveButton}>
+    <div className="container mt-4">
+      <h2>Update Task</h2>
+      <form onSubmit={handleSubmit} className="p-4 border rounded bg-light shadow-sm">
+        <div className="mb-3">
+          <label className="form-label">Title</label>
+          <input
+            type="text"
+            className="form-control"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Status</label>
+          <select
+            className="form-select"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Due Date</label>
+          <input
+            type="date"
+            className="form-control"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary w-100" disabled={saving}>
           {saving ? "Saving..." : "Update Task"}
         </button>
+
+        <button
+          type="button"
+          className="btn btn-secondary w-100 mt-2"
+          onClick={() => navigate("/tasks")}
+        >
+          Cancel
+        </button>
       </form>
-      <button 
-        style={styles.backButton} 
-        onClick={() => navigate("/tasks")}
-      >
-        Cancel
-      </button>
-      {message && <p style={styles.error}>{message}</p>}
     </div>
-  );
+  )
 }
 
-// --- Styles ---
-const styles = {
-  container: {
-    margin: "2rem auto",
-    padding: "1.5rem",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    maxWidth: "400px",
-    backgroundColor: "#fdfdfd",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  saveButton: {
-    padding: '0.75rem',
-    backgroundColor: '#28a745',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-  },
-  backButton: {
-    marginTop: '0.5rem',
-    backgroundColor: 'transparent',
-    border: '1px solid #aaa',
-    padding: '0.75rem',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    width: '100%',
-    fontSize: '1rem',
-  },
-  error: {
-    color: 'red',
-  }
-};
-
-export default TaskUpdate;
+export default TaskUpdate
